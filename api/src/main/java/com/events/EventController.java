@@ -2,6 +2,8 @@ package com.events;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -15,4 +17,7 @@ public class EventController {
     public List<Event> list() {
         return service.listAll();
     }
+
+    @PostMapping("newEvent")
+    public void createEvent(@RequestBody Event event) { service.save(event); }
 }
