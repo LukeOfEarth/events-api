@@ -1,10 +1,7 @@
 package com.events;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -17,6 +14,9 @@ public class EventController {
     public List<Event> list() {
         return service.listAll();
     }
+
+    @GetMapping("events/{id}")
+    public Event getEventById(@PathVariable Integer id) { return service.get(id); }
 
     @PostMapping("newEvent")
     public void createEvent(@RequestBody Event event) { service.save(event); }
