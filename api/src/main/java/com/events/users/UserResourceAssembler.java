@@ -1,5 +1,7 @@
 package com.events.users;
 
+import com.events.Event;
+import com.events.EventController;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
@@ -20,11 +22,20 @@ class UserResourceAssembler implements RepresentationModelAssembler<User, Entity
         Link usersLink = linkTo(methodOn(UserController.class).list()).withRel("all_users");
 
         //Create an entity model for the user, with a self link and a link to get all users
-        return EntityModel.of(
-                user,
+        EntityModel<User> userEntityModel = EntityModel.of(   user,
                 selfLink,
-                usersLink
-        );
+                usersLink);
+
+        //Add additional links for update and delete
+        final Link deleteLink = linkTo(methodOn(UserController.class).deleteUser(user.getUserId())).withRel("delete");
+        final Link updateLink = linkTo(methodOn(UserController.class).updateUser(user.getUserId(),null)).withRel("update");
+
+        //Add links to model
+        userEntityModel.add(deleteLink);
+        userEntityModel.add(updateLink);
+
+        return userEntityModel;
+
     }
 
     @Override
