@@ -6,7 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 @Embeddable
-class EventsUserKey implements Serializable {
+public class EventUserKey implements Serializable {
 
     @Column(name = "Event_Id")
     int eventid;
@@ -14,6 +14,15 @@ class EventsUserKey implements Serializable {
 
     @Column(name = "User_Id")
     int userid;
+
+
+    public EventUserKey() {
+    }
+
+    public EventUserKey(int eventid, int userid) {
+        this.eventid = eventid;
+        this.userid = userid;
+    }
 
     public int getEventid() {
         return eventid;
@@ -34,8 +43,8 @@ class EventsUserKey implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof EventsUserKey)) return false;
-        EventsUserKey that = (EventsUserKey) o;
+        if (!(o instanceof EventUserKey)) return false;
+        EventUserKey that = (EventUserKey) o;
         return eventid == that.eventid && userid == that.userid;
     }
 

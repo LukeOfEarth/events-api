@@ -6,11 +6,11 @@ import com.events.Event;
 import com.events.users.User;
 
 @Entity
-public class EventsUsers {
+public class EventUser {
 
 
     @EmbeddedId
-    EventsUserKey id;
+    EventUserKey id;
 
     @ManyToOne
     @MapsId("eventid")
@@ -25,22 +25,22 @@ public class EventsUsers {
 
     int Status;
 
-    public EventsUsers(EventsUserKey id, Event event, User user, int status) {
+    public EventUser(EventUserKey id, Event event, User user, int status) {
         this.id = id;
         this.event = event;
         this.user = user;
         Status = status;
     }
 
-    public EventsUsers() {
+    public EventUser() {
 
     }
 
-    public EventsUserKey getId() {
+    public EventUserKey getId() {
         return id;
     }
 
-    public void setId(EventsUserKey id) {
+    public void setId(EventUserKey id) {
         this.id = id;
     }
 
@@ -67,5 +67,6 @@ public class EventsUsers {
     public void setStatus(int status) {
         Status = status;
     }
+
 
 }

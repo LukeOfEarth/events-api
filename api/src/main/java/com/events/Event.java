@@ -1,6 +1,8 @@
 package com.events;
 
-import com.events.eventsusers.EventsUsers;
+import com.events.eventsusers.EventUserKey;
+import com.events.eventsusers.EventUser;
+import com.events.users.User;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
@@ -25,7 +27,7 @@ public class Event {
 
 
     @OneToMany(mappedBy = "event")
-    Set<EventsUsers> usersstatus;
+    Set<EventUser> usersstatus;
 
     public Event() {
 
@@ -97,7 +99,9 @@ public class Event {
         this.status = status;
     }
   
-    public Set<EventsUsers> getUsersstatus() {
+    public Set<EventUser> getUsersstatus() {
         return usersstatus;
     }
+
+
 }

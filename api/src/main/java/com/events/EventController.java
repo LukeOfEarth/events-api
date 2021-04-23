@@ -1,6 +1,11 @@
 package com.events;
 
 
+import com.events.eventsusers.EventUser;
+import com.events.eventsusers.EventUserKey;
+import com.events.eventsusers.EventUserService;
+import com.events.users.User;
+import com.events.users.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -17,10 +22,17 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class EventController {
     @Autowired
     private final EventService service;
+    @Autowired
+    private final UserService userservice;
+    @Autowired
+    private final EventUserService eventuserservice;
+
     private final EventResourceAssembler assembler;
 
-    public EventController(EventService service, EventResourceAssembler assembler) {
+    public EventController(EventService service, UserService userservice, EventUserService eventuserservice, EventResourceAssembler assembler) {
         this.service = service;
+        this.userservice = userservice;
+        this.eventuserservice = eventuserservice;
         this.assembler = assembler;
     }
 
@@ -61,6 +73,22 @@ public class EventController {
             return true;
             
         } catch (NoSuchElementException e) {
+            return false;
+        }
+    }
+
+    @PostMapping("events/{id}/join")
+    public boolean joinEvent(@PathVariable Integer id){
+        // TODO get USER ID from Auth.
+        try {
+            User user = userservice.get(1);
+            Event event =  service.get(id);
+            EventUserKey eventUserKey = new EventUserKey(event.getEventId(),user.getUserId());
+            EventUser eventUser = new EventUser(eventUserKey,event,user, 0);
+            eventuserservice.save(eventUser);
+            return true;
+        }
+        catch (NoSuchElementException e){
             return false;
         }
     }
