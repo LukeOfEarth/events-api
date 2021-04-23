@@ -4,5 +4,6 @@ CREATE DATABASE IF NOT EXISTS `eventsdb`;
   `User_Id` INT NOT NULL AUTO_INCREMENT,
   `Name` VARCHAR(45) NULL,
   `Email` VARCHAR(45) NULL,
+  `Status` INT DEFAULT 0,
   PRIMARY KEY (`User_Id`));
   
