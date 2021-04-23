@@ -16,13 +16,13 @@ class EventResourceAssembler implements RepresentationModelAssembler<Event, Enti
     public EntityModel<Event> toModel(Event event) {
         //Get a link to this function, and to the list all events function
         Link selfLink = linkTo(methodOn(EventController.class).getEventById(event.getEventId())).withSelfRel();
-        Link usersLink = linkTo(methodOn(EventController.class).list()).withRel("all_events");
+        Link eventsLink = linkTo(methodOn(EventController.class).list()).withRel("all_events");
 
         //Create an entity model for the event, with a self link and a link to get all events
         return EntityModel.of(
                 event,
                 selfLink,
-                usersLink
+                eventsLink
         );
     }
 
