@@ -99,15 +99,71 @@ public class EventController {
                 eventUser = new EventUser(eventUserKey,event,user, UserStatus.JOINED);
             }
 
-            if (eventUser.getStatus() == UserStatus.BANNED){
+            if (eventUser.getStatus() == UserStatus.BANNED) {
                 return false;
-            }else{
+            } else {
                 eventUser.setStatus(UserStatus.JOINED);
                 eventuserservice.save(eventUser);
                 return true;
             }
+        } catch (NoSuchElementException e) {
+            return false;
         }
-        catch (NoSuchElementException e){
+    }
+    @PostMapping("events/{eventid}/unban/{useridtounban}")
+    public boolean unbanUser(@PathVariable Integer eventid, @PathVariable Integer useridtounban) {
+        try {
+            // TODO get USER ID from Auth.
+            User user = userservice.get(1);
+
+            User usertoban = userservice.get(useridtounban);
+            Event event = service.get(eventid);
+            if (event.getOwnerId() == user.getUserId()) {
+                EventUserKey eventUserKey = new EventUserKey(event.getEventId(), usertoban.getUserId());
+                EventUser eventUser;
+                eventUser = eventuserservice.get(eventUserKey);
+                if (eventUser.getStatus() == UserStatus.BANNED) {
+                    eventUser.setStatus(UserStatus.JOINED);
+                    eventuserservice.save(eventUser);
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                // User is not event owner
+                return false;
+            }
+        } catch (NoSuchElementException e) {
+            // Event or User does not exist
+            return false;
+        }
+    }
+
+    @PostMapping("events/{eventid}/ban/{useridtoban}")
+    public boolean banUser(@PathVariable Integer eventid, @PathVariable Integer useridtoban) {
+        try {
+            // TODO get USER ID from Auth.
+            User user = userservice.get(1);
+
+            User usertoban = userservice.get(useridtoban);
+            Event event = service.get(eventid);
+            if (event.getOwnerId() == user.getUserId()) {
+                EventUserKey eventUserKey = new EventUserKey(event.getEventId(), usertoban.getUserId());
+                EventUser eventUser;
+                try {
+                    eventUser = eventuserservice.get(eventUserKey);
+                    eventUser.setStatus(UserStatus.BANNED);
+                } catch (NoSuchElementException ex) {
+                    eventUser = new EventUser(eventUserKey, event, user, UserStatus.BANNED);
+                }
+                eventuserservice.save(eventUser);
+                return true;
+            } else {
+                // User is not event owner
+                return false;
+            }
+        } catch (NoSuchElementException e) {
+            // Event or user does not exist
             return false;
         }
     }
@@ -123,18 +179,20 @@ public class EventController {
             try {
                 eventUser = eventuserservice.get(eventUserKey);
             }catch(NoSuchElementException ex){
+                // Has not joined thus cannot leave
                 return false;
             }
 
             if (eventUser.getStatus() == UserStatus.BANNED){
+                // Prevent BANNED user from changing own status
                 return false;
             }else{
                 eventUser.setStatus(UserStatus.LEFT);
                 eventuserservice.save(eventUser);
                 return true;
             }
-        }
-        catch (NoSuchElementException e){
+        }catch (NoSuchElementException e) {
+            // Event or user does not exist
             return false;
         }
     }
