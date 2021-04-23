@@ -18,6 +18,9 @@ public class UserController {
         return service.listAll();
     }
 
+    @PostMapping("users")
+    public void createUser(@RequestBody User user) { service.save(user); }
+
     @GetMapping("users/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Integer id) {
         try {
@@ -27,6 +30,7 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    @PostMapping("newUser")
-    public void createUser(@RequestBody User user) { service.save(user); }
+
+    @DeleteMapping("users/{id}")
+    public void deleteUser(@PathVariable Integer id) { service.delete(id); }
 }
