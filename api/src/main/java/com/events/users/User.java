@@ -1,9 +1,17 @@
 package com.events.users;
 
-import com.events.Event;
+
+import com.events.eventsusers.EventsUsers;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.*;
 import java.util.Set;
+
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "userId")
 
 @Entity
 public class User {
@@ -12,6 +20,11 @@ public class User {
     private int userId;
     private String name;
     private String email;
+
+
+
+    @OneToMany(mappedBy = "user")
+    Set<EventsUsers> eventsstatus;
 
     public User() {
 
@@ -44,6 +57,10 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Set<EventsUsers> getEventsstatus() {
+        return eventsstatus;
     }
 
     @Override

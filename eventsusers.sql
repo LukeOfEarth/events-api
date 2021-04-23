@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS `eventsdb`.`eventsusers` (
+CREATE TABLE IF NOT EXISTS `eventsdb`.`events_users` (
 	`Event_Id` INT NOT NULL,
 	`User_Id` INT NOT NULL,
 	`Status` INT NOT NULL,

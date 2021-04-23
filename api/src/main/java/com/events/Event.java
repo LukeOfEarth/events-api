@@ -1,11 +1,15 @@
 package com.events;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import java.sql.Date;
+import com.events.eventsusers.EventsUsers;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+import javax.persistence.*;
+import java.sql.Date;
+import java.util.Set;
+
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "eventId")
 @Entity
 public class Event {
     @Id
@@ -16,6 +20,10 @@ public class Event {
     private Date time;
     private String location;
     private int ownerId;
+
+
+    @OneToMany(mappedBy = "event")
+    Set<EventsUsers> usersstatus;
 
     public Event() {
 
@@ -77,4 +85,9 @@ public class Event {
     public void setOwnerId(int ownerId) {
         this.ownerId = ownerId;
     }
+
+    public Set<EventsUsers> getUsersstatus() {
+        return usersstatus;
+    }
+
 }
