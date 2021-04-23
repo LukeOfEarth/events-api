@@ -52,4 +52,10 @@ public class UserController {
     @DeleteMapping("users/{id}")
     public void deleteUser(@PathVariable Integer id) { service.delete(id); }
 
+    @PatchMapping("users/{id}")
+    public void updateUser(@PathVariable Integer id, @RequestBody User user){
+        user.setUserId(id);
+        service.update(user);
+    }
+
 }

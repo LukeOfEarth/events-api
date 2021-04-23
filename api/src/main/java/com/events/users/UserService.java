@@ -36,5 +36,13 @@ public class UserService {
         save(user);
     }
 
+    public void update(User user) {
+        Optional<User> userOptional = repo.findById(user.getUserId());
+        if(userOptional.isPresent()){
+            save(userOptional.get());
+        }
+        throw new NoSuchElementException("Unable to find user with id: "+user.getUserId());
+    }
+
 
 }
