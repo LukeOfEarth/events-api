@@ -1,33 +1,52 @@
 package com.events;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 import java.util.NoSuchElementException;
+
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 public class EventController {
     @Autowired
-    private EventService service;
+    private final EventService service;
+    private final EventResourceAssembler assembler;
 
-    @GetMapping("events")
-    public List<Event> list() {
-        return service.listAll();
+    public EventController(EventService service, EventResourceAssembler assembler) {
+        this.service = service;
+        this.assembler = assembler;
     }
 
-    @GetMapping("events/{id}")
-    public ResponseEntity<Event> getEventById(@PathVariable Integer id) {
-        try {
-            Event event = service.get(id);
-            return new ResponseEntity<Event>(event, HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<Event>(HttpStatus.NOT_FOUND);
-        }
+    @GetMapping("events")
+    public CollectionModel<EntityModel<Event>> list() {
+        //Create a collection model of events
+        CollectionModel<EntityModel<Event>> eventModels = assembler.toCollectionModel(service.listAll());
+
+        //Create a link to this function and add to the collection model
+        Link selfLink = linkTo(methodOn(EventController.class).list()).withSelfRel();
+        eventModels.add(selfLink);
+
+        //Return a collection model containing all events, and a link to this function
+        return eventModels;
     }
 
     @PostMapping("newEvent")
     public void createEvent(@RequestBody Event event) { service.save(event); }
+
+    @GetMapping("events/{id}")
+    public EntityModel<?> getEventById(@PathVariable Integer id) {
+        try {
+            Event event = service.get(id);
+            return assembler.toModel(event);
+        } catch (NoSuchElementException e) {
+            return EntityModel.of(HttpStatus.NOT_FOUND);
+        }
+    }
 }
