@@ -1,6 +1,7 @@
 package com.events.users;
 
 
+import com.events.Enums.UserAccountStatus;
 import com.events.eventsusers.EventUser;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -18,6 +19,7 @@ public class User {
     private int userId;
     private String name;
     private String email;
+    private UserAccountStatus status;
 
 
 
@@ -28,9 +30,10 @@ public class User {
 
     }
 
-    public User(String name, String email) {
+    public User(String name, String email, int status) {
         this.name = name;
         this.email = email;
+        this.status = UserAccountStatus.values()[status];
     }
 
     public int getUserId() {
@@ -55,6 +58,14 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public void setStatus(UserAccountStatus status){
+        this.status = status;
+    }
+
+    public UserAccountStatus getStatus(){
+        return status;
     }
 
     public Set<EventUser> getEventsstatus() {

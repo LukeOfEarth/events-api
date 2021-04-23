@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import com.events.Enums.UserAccountStatus;
+
 @Service
 public class UserService {
     @Autowired
@@ -29,7 +31,9 @@ public class UserService {
     }
 
     public void delete(Integer id) {
-        repo.deleteById(id);
+        User user = get(id);
+        user.setStatus(UserAccountStatus.DELETED);
+        save(user);
     }
 
 
