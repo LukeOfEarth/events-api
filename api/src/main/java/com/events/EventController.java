@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import java.util.NoSuchElementException;
 
-import com.events.Enums.EventStatus;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
@@ -37,9 +36,6 @@ public class EventController {
         return eventModels;
     }
 
-    @PostMapping("newEvent")
-    public void createEvent(@RequestBody Event event) { service.save(event); }
-
     @GetMapping("events/{id}")
     public EntityModel<?> getEventById(@PathVariable Integer id) {
         try {
@@ -56,15 +52,23 @@ public class EventController {
     }
 
     @PostMapping("events/cancel/{id}")
-    public boolean cancelEvent(@PathVariable Integer id) {
-        try {
-            Event event = service.get(id);
-            event.setStatus(EventStatus.CANCELED);
-            service.save(event);
-            return true;
-            
-        } catch (NoSuchElementException e) {
-            return false;
-        }
+    public void cancelEvent(@PathVariable Integer id) {
+        service.cancel(id);
+    }
+
+    @PostMapping("events/delete/{id}") 
+    public void deleteEvent(@PathVariable Integer id) {
+        service.delete(id);
+    }
+
+    @PostMapping("events/complete/{id}")
+    public void markFinished(@PathVariable Integer id) {
+        service.complete(id);
+    }
+
+    @PostMapping("events/update/{id}")
+    public void updateEvent(@RequestBody Event event,@PathVariable Integer id) {
+        event.setEventId(id);
+        service.update(event);
     }
 }
