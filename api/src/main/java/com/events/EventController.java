@@ -37,9 +37,6 @@ public class EventController {
         return eventModels;
     }
 
-    @PostMapping("newEvent")
-    public void createEvent(@RequestBody Event event) { service.save(event); }
-
     @GetMapping("events/{id}")
     public EntityModel<?> getEventById(@PathVariable Integer id) {
         try {
