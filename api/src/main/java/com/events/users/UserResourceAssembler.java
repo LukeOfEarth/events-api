@@ -1,7 +1,5 @@
 package com.events.users;
 
-import com.events.Event;
-import com.events.EventController;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
