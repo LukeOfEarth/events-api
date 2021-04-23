@@ -163,6 +163,46 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Ban a user",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{Server}}/events/1/ban/1",
+					"host": [
+						"{{Server}}"
+					],
+					"path": [
+						"events",
+						"1",
+						"ban",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Unban a user",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{Server}}/events/1/unban/1",
+					"host": [
+						"{{Server}}"
+					],
+					"path": [
+						"events",
+						"1",
+						"unban",
+						"1"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"event": [

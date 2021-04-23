@@ -14,8 +14,8 @@ public class EventUserService {
 
 
 
-    public void save(EventUser eventuser) {
-        repo.save(eventuser);
+    public EventUser save(EventUser eventuser) {
+        return repo.save(eventuser);
     }
 
     public EventUser get(EventUserKey id) {
