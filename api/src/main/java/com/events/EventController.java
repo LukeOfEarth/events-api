@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import com.events.Enums.EventStatus;
+
 @RestController
 public class EventController {
     @Autowired
@@ -29,5 +31,20 @@ public class EventController {
     }
 
     @PostMapping("newEvent")
-    public void createEvent(@RequestBody Event event) { service.save(event); }
+    public void createEvent(@RequestBody Event event) {
+        service.save(event);
+    }
+
+    @PostMapping("events/cancel/{id}")
+    public boolean cancelEvent(@PathVariable Integer id) {
+        try {
+            Event event = service.get(id);
+            event.setStatus(EventStatus.CANCELED);
+            service.save(event);
+            return true;
+            
+        } catch (NoSuchElementException e) {
+            return false;
+        }
+    }
 }

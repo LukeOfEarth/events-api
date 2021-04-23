@@ -6,5 +6,6 @@ CREATE TABLE `eventsdb`.`event` (
   `Description` VARCHAR(200) NULL,
   `Time` DATETIME NOT NULL,
   `Location` VARCHAR(100) NOT NULL,
+  `Status` INT DEFAULT 0,
   `Owner_Id` INT NULL,
   PRIMARY KEY (`Event_Id`));
