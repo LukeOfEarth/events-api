@@ -3,8 +3,10 @@ package com.events.users;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.NoSuchElementException;
 
@@ -24,7 +26,7 @@ public class UserController {
     }
 
     @GetMapping("users")
-    public CollectionModel<EntityModel<User>> list() {
+    public ResponseEntity<?> list() {
         //Create a collection model of users
         CollectionModel<EntityModel<User>> userModels = assembler.toCollectionModel(service.listAll());
 
@@ -33,29 +35,40 @@ public class UserController {
         userModels.add(selfLink);
 
         //Return a collection model containing all users, and a link to this function
-        return userModels;
+
+        return ResponseEntity.ok(userModels);
     }
 
     @PostMapping("users")
-    public void createUser(@RequestBody User user) { service.save(user); }
+    public ResponseEntity<?> createUser(@RequestBody User user) {
+        EntityModel<User> userEntityModel = assembler.toModel(service.save(user));
+
+        return ResponseEntity.created(userEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(userEntityModel);
+    }
 
     @GetMapping("users/{id}")
-    public EntityModel<?> getUserById(@PathVariable Integer id) {
+    public ResponseEntity<?> getUserById(@PathVariable Integer id) {
         try {
             User user = service.get(id);
-            return assembler.toModel(user);
+            return ResponseEntity.ok(assembler.toModel(user));
         } catch (NoSuchElementException e) {
-            return EntityModel.of(HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
     @DeleteMapping("users/{id}")
-    public void deleteUser(@PathVariable Integer id) { service.delete(id); }
+    public ResponseEntity<?> deleteUser(@PathVariable Integer id) {
+        service.delete(id);
+
+        return ResponseEntity.noContent().build();
+    }
 
     @PatchMapping("users/{id}")
-    public void updateUser(@PathVariable Integer id, @RequestBody User user){
+    public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestBody User user){
         user.setUserId(id);
-        service.update(user);
+        EntityModel<User> userEntityModel = assembler.toModel(service.update(user));
+
+        return ResponseEntity.created(userEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(userEntityModel);
     }
 
 }

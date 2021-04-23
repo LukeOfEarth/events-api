@@ -1,9 +1,6 @@
 package com.events;
 
 import com.events.Enums.EventStatus;
-import com.events.eventsusers.EventUser;
-import com.events.eventsusers.EventsUsersRepository;
-import com.events.users.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,8 +18,8 @@ public class EventService {
         return repo.findAll();
     }
 
-    public void save(Event event) {
-        repo.save(event);
+    public Event save(Event event) {
+        return repo.save(event);
     }
 
     public Event get(Integer id) {
@@ -33,14 +30,14 @@ public class EventService {
         throw new NoSuchElementException("Unable to find event with id: "+id);
     }
     
-    public void update( Event updatedEvent) {
-        save(updatedEvent); 
+    public Event update( Event updatedEvent) {
+        return save(updatedEvent);
     }
 
-    public void cancel(int eventID){
+    public Event cancel(int eventID){
         Event event = get(eventID);
         event.setStatus(EventStatus.CANCELED);
-        update(event);
+        return update(event);
     }
 
     public void delete(int eventID){
@@ -49,9 +46,9 @@ public class EventService {
         update(event);
     }
 
-    public void complete(int eventID){
+    public Event complete(int eventID){
         Event event = get(eventID);
         event.setStatus(EventStatus.FINISHED);
-        update(event);
+        return update(event);
     }
 }

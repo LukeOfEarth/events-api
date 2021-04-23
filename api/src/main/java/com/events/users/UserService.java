@@ -18,8 +18,8 @@ public class UserService {
         return repo.findAll();
     }
 
-    public void save(User user) {
-        repo.save(user);
+    public User save(User user) {
+        return repo.save(user);
     }
 
     public User get(Integer id) {
@@ -36,10 +36,10 @@ public class UserService {
         save(user);
     }
 
-    public void update(User user) {
+    public User update(User user) {
         Optional<User> userOptional = repo.findById(user.getUserId());
         if(userOptional.isPresent()){
-            save(userOptional.get());
+            return save(userOptional.get());
         }
         throw new NoSuchElementException("Unable to find user with id: "+user.getUserId());
     }
