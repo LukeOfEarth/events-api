@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import java.util.NoSuchElementException;
 
-
+import com.events.Enums.EventStatus;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
@@ -47,6 +47,24 @@ public class EventController {
             return assembler.toModel(event);
         } catch (NoSuchElementException e) {
             return EntityModel.of(HttpStatus.NOT_FOUND);
+        }
+    }
+  
+    @PostMapping("newEvent")
+    public void createEvent(@RequestBody Event event) {
+        service.save(event);
+    }
+
+    @PostMapping("events/cancel/{id}")
+    public boolean cancelEvent(@PathVariable Integer id) {
+        try {
+            Event event = service.get(id);
+            event.setStatus(EventStatus.CANCELED);
+            service.save(event);
+            return true;
+            
+        } catch (NoSuchElementException e) {
+            return false;
         }
     }
 }

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.*;
 import java.sql.Date;
+import com.events.Enums.EventStatus;
 import java.util.Set;
 
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,
@@ -20,6 +21,7 @@ public class Event {
     private Date time;
     private String location;
     private int ownerId;
+    private EventStatus status;
 
 
     @OneToMany(mappedBy = "event")
@@ -29,13 +31,14 @@ public class Event {
 
     }
 
-    public Event(int eventId, String name, String description, Date time, String location, int ownerId) {
+    public Event(int eventId, String name, String description, Date time, String location, int ownerId, int status) {
         this.eventId = eventId;
         this.name = name;
         this.description = description;
         this.time = time;
         this.location = location;
         this.ownerId = ownerId;
+        this.status = EventStatus.values()[status];
     }
 
     public int getEventId() {
@@ -86,8 +89,15 @@ public class Event {
         this.ownerId = ownerId;
     }
 
+    public EventStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(EventStatus status) {
+        this.status = status;
+    }
+  
     public Set<EventsUsers> getUsersstatus() {
         return usersstatus;
     }
-
 }
