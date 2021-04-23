@@ -1,5 +1,6 @@
 package com.events;
 
+import com.events.Enums.EventStatus;
 import com.events.eventsusers.EventsUsers;
 import com.events.eventsusers.EventsUsersRepository;
 import com.events.users.User;
@@ -35,7 +36,25 @@ public class EventService {
         throw new NoSuchElementException("Unable to find event with id: "+id);
     }
     
-    public  void delete(Integer id) {
-        repo.deleteById(id);
+    public void update( Event updatedEvent) {
+        save(updatedEvent); 
+    }
+
+    public void cancel(int eventID){
+        Event event = get(eventID);
+        event.setStatus(EventStatus.CANCELED);
+        update(event);
+    }
+
+    public void delete(int eventID){
+        Event event = get(eventID);
+        event.setStatus(EventStatus.DELETED);
+        update(event);
+    }
+
+    public void complete(int eventID){
+        Event event = get(eventID);
+        event.setStatus(EventStatus.FINISHED);
+        update(event);
     }
 }
