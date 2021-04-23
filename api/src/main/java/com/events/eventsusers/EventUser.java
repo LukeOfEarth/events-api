@@ -2,15 +2,16 @@ package com.events.eventsusers;
 
 import javax.persistence.*;
 
+import com.events.Enums.UserStatus;
 import com.events.Event;
 import com.events.users.User;
 
 @Entity
-public class EventsUsers {
+public class EventUser {
 
 
     @EmbeddedId
-    EventsUserKey id;
+    EventUserKey id;
 
     @ManyToOne
     @MapsId("eventid")
@@ -23,24 +24,24 @@ public class EventsUsers {
     @JoinColumn(name = "User_Id")
     User user;
 
-    int Status;
+    UserStatus status;
 
-    public EventsUsers(EventsUserKey id, Event event, User user, int status) {
+    public EventUser(EventUserKey id, Event event, User user, UserStatus status) {
         this.id = id;
         this.event = event;
         this.user = user;
-        Status = status;
+        this.status = status;
     }
 
-    public EventsUsers() {
+    public EventUser() {
 
     }
 
-    public EventsUserKey getId() {
+    public EventUserKey getId() {
         return id;
     }
 
-    public void setId(EventsUserKey id) {
+    public void setId(EventUserKey id) {
         this.id = id;
     }
 
@@ -60,12 +61,13 @@ public class EventsUsers {
         this.user = user;
     }
 
-    public int getStatus() {
-        return Status;
+    public UserStatus getStatus() {
+        return status;
     }
 
-    public void setStatus(int status) {
-        Status = status;
+    public void setStatus(UserStatus status) {
+        this.status = status;
     }
+
 
 }
