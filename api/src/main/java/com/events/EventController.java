@@ -1,6 +1,7 @@
 package com.events;
 
 
+import com.events.Enums.UserStatus;
 import com.events.eventsusers.EventUser;
 import com.events.eventsusers.EventUserKey;
 import com.events.eventsusers.EventUserService;
@@ -84,9 +85,47 @@ public class EventController {
             User user = userservice.get(1);
             Event event =  service.get(id);
             EventUserKey eventUserKey = new EventUserKey(event.getEventId(),user.getUserId());
-            EventUser eventUser = new EventUser(eventUserKey,event,user, 0);
-            eventuserservice.save(eventUser);
-            return true;
+            EventUser eventUser;
+            try {
+                eventUser = eventuserservice.get(eventUserKey);
+            }catch(NoSuchElementException ex){
+                eventUser = new EventUser(eventUserKey,event,user, UserStatus.JOINED);
+            }
+
+            if (eventUser.getStatus() == UserStatus.BANNED){
+                return false;
+            }else{
+                eventUser.setStatus(UserStatus.JOINED);
+                eventuserservice.save(eventUser);
+                return true;
+            }
+        }
+        catch (NoSuchElementException e){
+            return false;
+        }
+    }
+
+    @PostMapping("events/{id}/leave")
+    public boolean leaveEvent(@PathVariable Integer id){
+        // TODO get USER ID from Auth.
+        try {
+            User user = userservice.get(1);
+            Event event =  service.get(id);
+            EventUserKey eventUserKey = new EventUserKey(event.getEventId(),user.getUserId());
+            EventUser eventUser;
+            try {
+                eventUser = eventuserservice.get(eventUserKey);
+            }catch(NoSuchElementException ex){
+                return false;
+            }
+
+            if (eventUser.getStatus() == UserStatus.BANNED){
+                return false;
+            }else{
+                eventUser.setStatus(UserStatus.LEFT);
+                eventuserservice.save(eventUser);
+                return true;
+            }
         }
         catch (NoSuchElementException e){
             return false;

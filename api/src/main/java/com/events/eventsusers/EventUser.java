@@ -2,6 +2,7 @@ package com.events.eventsusers;
 
 import javax.persistence.*;
 
+import com.events.Enums.UserStatus;
 import com.events.Event;
 import com.events.users.User;
 
@@ -23,13 +24,13 @@ public class EventUser {
     @JoinColumn(name = "User_Id")
     User user;
 
-    int Status;
+    UserStatus status;
 
-    public EventUser(EventUserKey id, Event event, User user, int status) {
+    public EventUser(EventUserKey id, Event event, User user, UserStatus status) {
         this.id = id;
         this.event = event;
         this.user = user;
-        Status = status;
+        this.status = status;
     }
 
     public EventUser() {
@@ -60,12 +61,12 @@ public class EventUser {
         this.user = user;
     }
 
-    public int getStatus() {
-        return Status;
+    public UserStatus getStatus() {
+        return status;
     }
 
-    public void setStatus(int status) {
-        Status = status;
+    public void setStatus(UserStatus status) {
+        this.status = status;
     }
 
 

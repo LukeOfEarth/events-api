@@ -19,9 +19,9 @@ public class EventUserService {
     }
 
     public EventUser get(EventUserKey id) {
-        Optional<EventUser> event = repo.findById(id);
-        if(event.isPresent()){
-            return event.get();
+        Optional<EventUser> eventuser = repo.findById(id);
+        if(eventuser.isPresent()){
+            return eventuser.get();
         }
         throw new NoSuchElementException("Unable to find event with id: "+id);
     }
