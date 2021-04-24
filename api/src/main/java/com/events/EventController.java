@@ -10,8 +10,10 @@ import com.events.users.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.NoSuchElementException;
 
@@ -37,7 +39,7 @@ public class EventController {
     }
 
     @GetMapping("events")
-    public CollectionModel<EntityModel<Event>> list() {
+    public ResponseEntity<?> list() {
         //Create a collection model of events
         CollectionModel<EntityModel<Event>> eventModels = assembler.toCollectionModel(service.listAll());
 
@@ -46,47 +48,56 @@ public class EventController {
         eventModels.add(selfLink);
 
         //Return a collection model containing all events, and a link to this function
-        return eventModels;
+        return ResponseEntity.ok(eventModels);
     }
 
     @GetMapping("events/{id}")
-    public EntityModel<?> getEventById(@PathVariable Integer id) {
+    public ResponseEntity<?> getEventById(@PathVariable Integer id) {
         try {
             Event event = service.get(id);
-            return assembler.toModel(event);
+            return ResponseEntity.ok(assembler.toModel(event));
         } catch (NoSuchElementException e) {
-            return EntityModel.of(HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
   
     @PostMapping("newEvent")
-    public void createEvent(@RequestBody Event event) {
-        service.save(event);
+    public ResponseEntity<?> createEvent(@RequestBody Event event) {
+        EntityModel<Event> eventEntityModel = assembler.toModel(service.save(event));
+
+        return ResponseEntity.created(eventEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(eventEntityModel);
     }
 
     @PostMapping("events/cancel/{id}")
-    public void cancelEvent(@PathVariable Integer id) {
-        service.cancel(id);
+    public ResponseEntity<?> cancelEvent(@PathVariable Integer id) {
+        EntityModel<Event> eventEntityModel = assembler.toModel(service.cancel(id));
+
+        return ResponseEntity.created(eventEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(eventEntityModel);
     }
 
     @PostMapping("events/delete/{id}") 
-    public void deleteEvent(@PathVariable Integer id) {
+    public ResponseEntity<Object> deleteEvent(@PathVariable Integer id) {
         service.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("events/complete/{id}")
-    public void markFinished(@PathVariable Integer id) {
-        service.complete(id);
+    public ResponseEntity<?> markFinished(@PathVariable Integer id) {
+        EntityModel<Event> eventEntityModel = assembler.toModel(service.complete(id));
+
+        return ResponseEntity.created(eventEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(eventEntityModel);
     }
 
     @PostMapping("events/update/{id}")
-    public void updateEvent(@RequestBody Event event,@PathVariable Integer id) {
+    public ResponseEntity<?> updateEvent(@RequestBody Event event, @PathVariable Integer id) {
         event.setEventId(id);
-        service.update(event);
+        EntityModel<Event> eventEntityModel = assembler.toModel(service.update(event));
+
+        return ResponseEntity.created(eventEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(eventEntityModel);
     }
 
     @PostMapping("events/{id}/join")
-    public boolean joinEvent(@PathVariable Integer id){
+    public ResponseEntity<?> joinEvent(@PathVariable Integer id){
         // TODO get USER ID from Auth.
         try {
             User user = userservice.get(1);
@@ -100,20 +111,82 @@ public class EventController {
             }
 
             if (eventUser.getStatus() == UserStatus.BANNED){
-                return false;
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User has been banned from the event.");
             }else{
                 eventUser.setStatus(UserStatus.JOINED);
                 eventuserservice.save(eventUser);
-                return true;
+                EntityModel<Event> eventEntityModel = assembler.toModel(event);
+                return ResponseEntity.ok(eventEntityModel);
             }
         }
         catch (NoSuchElementException e){
-            return false;
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("events/{eventid}/unban/{useridtounban}")
+    public ResponseEntity<?> unbanUser(@PathVariable Integer eventid, @PathVariable Integer useridtounban) {
+        try {
+            // TODO get USER ID from Auth.
+            User user = userservice.get(1);
+
+            User usertoban = userservice.get(useridtounban);
+            Event event = service.get(eventid);
+            if (event.getOwnerId() == user.getUserId()) {
+                EventUserKey eventUserKey = new EventUserKey(event.getEventId(), usertoban.getUserId());
+                EventUser eventUser;
+                eventUser = eventuserservice.get(eventUserKey);
+                if (eventUser.getStatus() == UserStatus.BANNED) {
+                    eventUser.setStatus(UserStatus.JOINED);
+                    eventuserservice.save(eventUser);
+
+                    //TODO replace this with something more meaningful if required
+                    return ResponseEntity.ok().build();
+                } else {
+                    return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("You cannot unban a user that isn't banned");
+                }
+            } else {
+                // User is not event owner
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User does not have the authority to unban a user from this event.");
+            }
+        } catch (NoSuchElementException e) {
+            // Event or User does not exist
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("events/{eventid}/ban/{useridtoban}")
+    public ResponseEntity<?> banUser(@PathVariable Integer eventid, @PathVariable Integer useridtoban) {
+        try {
+            // TODO get USER ID from Auth.
+            User user = userservice.get(1);
+
+            User usertoban = userservice.get(useridtoban);
+            Event event = service.get(eventid);
+            if (event.getOwnerId() == user.getUserId()) {
+                EventUserKey eventUserKey = new EventUserKey(event.getEventId(), usertoban.getUserId());
+                EventUser eventUser;
+                try {
+                    eventUser = eventuserservice.get(eventUserKey);
+                    eventUser.setStatus(UserStatus.BANNED);
+                } catch (NoSuchElementException ex) {
+                    eventUser = new EventUser(eventUserKey, event, user, UserStatus.BANNED);
+                }
+                eventuserservice.save(eventUser);
+                //TODO replace this with something more meaningful if required
+                return ResponseEntity.ok().build();
+            } else {
+                // User is not event owner
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User does not have the authority to ban a user from this event");
+            }
+        } catch (NoSuchElementException e) {
+            // Event or user does not exist
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
     @PostMapping("events/{id}/leave")
-    public boolean leaveEvent(@PathVariable Integer id){
+    public ResponseEntity<?> leaveEvent(@PathVariable Integer id){
         // TODO get USER ID from Auth.
         try {
             User user = userservice.get(1);
@@ -123,19 +196,22 @@ public class EventController {
             try {
                 eventUser = eventuserservice.get(eventUserKey);
             }catch(NoSuchElementException ex){
-                return false;
+                // Has not joined thus cannot leave
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
             }
 
             if (eventUser.getStatus() == UserStatus.BANNED){
-                return false;
+                // Prevent BANNED user from changing own status
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User has been banned from the event.");
             }else{
                 eventUser.setStatus(UserStatus.LEFT);
                 eventuserservice.save(eventUser);
-                return true;
+                EntityModel<Event> eventEntityModel = assembler.toModel(event);
+                return ResponseEntity.ok(eventEntityModel);
             }
-        }
-        catch (NoSuchElementException e){
-            return false;
+        }catch (NoSuchElementException e) {
+            // Event or user does not exist
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 }

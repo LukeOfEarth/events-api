@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "c1337e14-4f6b-4b6c-b376-b303d055709c",
+		"_postman_id": "bba14166-6662-4ada-a13d-0a7eef2aef28",
 		"name": "Events API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -89,11 +89,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{Server}}/1",
+					"raw": "{{Server}}/events/1",
 					"host": [
 						"{{Server}}"
 					],
 					"path": [
+						"events",
 						"1"
 					]
 				}
@@ -159,6 +160,46 @@
 						"events",
 						"1",
 						"leave"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Ban a user",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{Server}}/events/1/ban/1",
+					"host": [
+						"{{Server}}"
+					],
+					"path": [
+						"events",
+						"1",
+						"ban",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Unban a user",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{Server}}/events/1/unban/1",
+					"host": [
+						"{{Server}}"
+					],
+					"path": [
+						"events",
+						"1",
+						"unban",
+						"1"
 					]
 				}
 			},
