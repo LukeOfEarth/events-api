@@ -14,6 +14,8 @@ import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.NoSuchElementException;
@@ -39,10 +41,20 @@ public class EventController {
         this.eventResourceAssembler = eventResourceAssembler;
     }
 
+    private String getAuthUserEmail(OidcUser principle){
+        return principle.getAttributes().get("email").toString();
+    }
+    private boolean getIsEventOwner(Event event, OidcUser principle){
+        String authUserEmail = getAuthUserEmail(principle);
+
+        User owner  = userservice.get(event.getOwnerId());
+
+        return owner.getEmail().equalsIgnoreCase(authUserEmail);
+    }
+
     @GetMapping("events")
     public ResponseEntity<?> list() {
-        //TODO integrate user auth to determine if user making call is owner
-        eventResourceAssembler.setIsOwner(false); //Make true if is owner, used to filter links
+        eventResourceAssembler.setIsOwner(false);
         //Create a collection model of events
         CollectionModel<EntityModel<Event>> eventModels = eventResourceAssembler.toCollectionModel(service.listAll());
 
@@ -55,12 +67,14 @@ public class EventController {
     }
 
     @GetMapping("events/{id}")
-    public ResponseEntity<?> getEventById(@PathVariable Integer id) {
+    public ResponseEntity<?> getEventById(@PathVariable Integer id,@AuthenticationPrincipal OidcUser principle) {
         try {
 
             Event event = service.get(id);
-            //TODO integrate user auth to determine if user making call is owner
-            eventResourceAssembler.setIsOwner(false); //Make true if is owner, used to filter links
+
+            eventResourceAssembler.setIsOwner(getIsEventOwner(event,principle));
+
+            //Make true if is owner, used to filter links
             return ResponseEntity.ok(eventResourceAssembler.toModel(event));
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -68,54 +82,68 @@ public class EventController {
     }
 
     @PostMapping("newEvent")
-    public ResponseEntity<?> createEvent(@RequestBody Event event) {
+    public ResponseEntity<?> createEvent(@RequestBody Event event,@AuthenticationPrincipal OidcUser principle) {
         //User is automatically owner if they create a new event
-        eventResourceAssembler.setIsOwner(true);
+        eventResourceAssembler.setIsOwner(getIsEventOwner(event,principle));
         EntityModel<Event> eventEntityModel = eventResourceAssembler.toModel(service.save(event));
 
         return ResponseEntity.created(eventEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(eventEntityModel);
     }
 
     @PostMapping("events/cancel/{id}")
-    public ResponseEntity<?> cancelEvent(@PathVariable Integer id) {
-        //TODO add user auth so only owner can do this
-        eventResourceAssembler.setIsOwner(true);
-        EntityModel<Event> eventEntityModel = eventResourceAssembler.toModel(service.cancel(id));
-
-        return ResponseEntity.created(eventEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(eventEntityModel);
+    public ResponseEntity<?> cancelEvent(@PathVariable Integer id,@AuthenticationPrincipal OidcUser principle) {
+        Event event = service.get(id);
+        boolean isOwner = getIsEventOwner(event,principle);
+        eventResourceAssembler.setIsOwner(isOwner);
+        if(isOwner) {
+            EntityModel<Event> eventEntityModel = eventResourceAssembler.toModel(service.cancel(id));
+            return ResponseEntity.created(eventEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(eventEntityModel);
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Insufficient privileges");
     }
 
     @PostMapping("events/delete/{id}")
-    public ResponseEntity<Object> deleteEvent(@PathVariable Integer id) {
-        //TODO add user auth so only owner can do this
-        service.delete(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Object> deleteEvent(@PathVariable Integer id,@AuthenticationPrincipal OidcUser principle) {
+        Event event = service.get(id);
+        boolean isOwner = getIsEventOwner(event,principle);
+        eventResourceAssembler.setIsOwner(isOwner);
+        if(isOwner) {
+            service.delete(id);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Insufficient privileges");
     }
 
     @PostMapping("events/complete/{id}")
-    public ResponseEntity<?> markFinished(@PathVariable Integer id) {
-        //TODO add user auth so only owner can do this
-        eventResourceAssembler.setIsOwner(true);
-        EntityModel<Event> eventEntityModel = eventResourceAssembler.toModel(service.complete(id));
-
-        return ResponseEntity.created(eventEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(eventEntityModel);
+    public ResponseEntity<?> markFinished(@PathVariable Integer id,@AuthenticationPrincipal OidcUser principle) {
+        Event event = service.get(id);
+        boolean isOwner = getIsEventOwner(event,principle);
+        eventResourceAssembler.setIsOwner(isOwner);
+        if(isOwner) {
+            EntityModel<Event> eventEntityModel = eventResourceAssembler.toModel(service.complete(id));
+            return ResponseEntity.created(eventEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(eventEntityModel);
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Insufficient privileges");
     }
 
     @PostMapping("events/update/{id}")
-    public ResponseEntity<?> updateEvent(@RequestBody Event event, @PathVariable Integer id) {
-        //TODO add user auth so only owner can do this
-        eventResourceAssembler.setIsOwner(true);
-        event.setEventId(id);
-        EntityModel<Event> eventEntityModel = eventResourceAssembler.toModel(service.update(event));
+    public ResponseEntity<?> updateEvent(@RequestBody Event event, @PathVariable Integer id,@AuthenticationPrincipal OidcUser principle) {
+        Event eventOriginal = service.get(id);
+        boolean isOwner = getIsEventOwner(eventOriginal,principle);
+        eventResourceAssembler.setIsOwner(isOwner);
+        if(isOwner) {
+            event.setEventId(id);
+            EntityModel<Event> eventEntityModel = eventResourceAssembler.toModel(service.update(event));
 
-        return ResponseEntity.created(eventEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(eventEntityModel);
+            return ResponseEntity.created(eventEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(eventEntityModel);
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Insufficient privileges");
     }
 
     @PostMapping("events/{id}/join")
-    public ResponseEntity<?> joinEvent(@PathVariable Integer id) {
-        // TODO get USER ID from Auth.
+    public ResponseEntity<?> joinEvent(@PathVariable Integer id,@AuthenticationPrincipal OidcUser principle) {
         try {
-            User user = userservice.get(1);
+            User user = userservice.getByEmail(getAuthUserEmail(principle));
             Event event = service.get(id);
             EventUserKey eventUserKey = new EventUserKey(event.getEventId(), user.getUserId());
             EventUser eventUser;
@@ -139,10 +167,9 @@ public class EventController {
     }
 
     @PostMapping("events/{eventid}/unban/{useridtounban}")
-    public ResponseEntity<?> unbanUser(@PathVariable Integer eventid, @PathVariable Integer useridtounban) {
+    public ResponseEntity<?> unbanUser(@PathVariable Integer eventid, @PathVariable Integer useridtounban,@AuthenticationPrincipal OidcUser principle) {
         try {
-            // TODO get USER ID from Auth.
-            User user = userservice.get(1);
+            User user = userservice.getByEmail(getAuthUserEmail(principle));
 
             User usertoban = userservice.get(useridtounban);
             Event event = service.get(eventid);
@@ -154,7 +181,6 @@ public class EventController {
                     eventUser.setStatus(UserStatus.JOINED);
                     eventuserservice.save(eventUser);
 
-                    //TODO replace this with something more meaningful if required
                     return ResponseEntity.ok().build();
                 } else {
                     return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("You cannot unban a user that isn't banned");
@@ -170,10 +196,9 @@ public class EventController {
     }
 
     @PostMapping("events/{eventid}/ban/{useridtoban}")
-    public ResponseEntity<?> banUser(@PathVariable Integer eventid, @PathVariable Integer useridtoban) {
+    public ResponseEntity<?> banUser(@PathVariable Integer eventid, @PathVariable Integer useridtoban,@AuthenticationPrincipal OidcUser principle) {
         try {
-            // TODO get USER ID from Auth.
-            User user = userservice.get(1);
+            User user = userservice.getByEmail(getAuthUserEmail(principle));
 
             User usertoban = userservice.get(useridtoban);
             Event event = service.get(eventid);
@@ -187,7 +212,6 @@ public class EventController {
                     eventUser = new EventUser(eventUserKey, event, user, UserStatus.BANNED);
                 }
                 eventuserservice.save(eventUser);
-                //TODO replace this with something more meaningful if required
                 return ResponseEntity.ok().build();
             } else {
                 // User is not event owner
@@ -200,10 +224,9 @@ public class EventController {
     }
 
     @PostMapping("events/{id}/leave")
-    public ResponseEntity<?> leaveEvent(@PathVariable Integer id) {
-        // TODO get USER ID from Auth.
+    public ResponseEntity<?> leaveEvent(@PathVariable Integer id,@AuthenticationPrincipal OidcUser principle) {
         try {
-            User user = userservice.get(1);
+            User user = userservice.getByEmail(getAuthUserEmail(principle));
             Event event = service.get(id);
             EventUserKey eventUserKey = new EventUserKey(event.getEventId(), user.getUserId());
             EventUser eventUser;

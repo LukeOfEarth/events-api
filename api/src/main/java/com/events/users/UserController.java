@@ -7,6 +7,8 @@ import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.*;
 import java.util.NoSuchElementException;
 
@@ -45,6 +47,7 @@ public class UserController {
 
     @PostMapping("users")
     public ResponseEntity<?> createUser(@RequestBody User user) {
+
         EntityModel<User> userEntityModel = assembler.toModel(service.save(user));
 
         return ResponseEntity.created(userEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(userEntityModel);
@@ -61,19 +64,31 @@ public class UserController {
     }
 
     @DeleteMapping("users/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable Integer id) {
-        service.delete(id);
+    public ResponseEntity<?> deleteUser(@PathVariable Integer id,@AuthenticationPrincipal OidcUser principle) {
+        String authUserEmail = principle.getAttributes().get("email").toString();
 
+        User user = service.get(id);
+
+        if(user.getEmail().equalsIgnoreCase(authUserEmail)) {
+            service.delete(id);
+        }else{
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Insufficient privileges");
+        }
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("users/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestBody User user){
+    public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestBody User user,@AuthenticationPrincipal OidcUser principle){
+        String authUserEmail = principle.getAttributes().get("email").toString();
 
-        user.setUserId(id);
-        EntityModel<User> userEntityModel = assembler.toModel(service.update(user));
+        if(user.getEmail().equalsIgnoreCase(authUserEmail)) {
+            user.setUserId(id);
+            EntityModel<User> userEntityModel = assembler.toModel(service.update(user));
+            return ResponseEntity.created(userEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(userEntityModel);
+        }
 
-        return ResponseEntity.created(userEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(userEntityModel);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Insufficient privileges");
+
     }
 
 }

@@ -25,8 +25,8 @@ class UserResourceAssembler implements RepresentationModelAssembler<User, Entity
                 usersLink);
 
         //Add additional links for update and delete
-        final Link deleteLink = linkTo(methodOn(UserController.class).deleteUser(user.getUserId())).withRel("delete");
-        final Link updateLink = linkTo(methodOn(UserController.class).updateUser(user.getUserId(),null)).withRel("update");
+        final Link deleteLink = linkTo(methodOn(UserController.class).deleteUser(user.getUserId(),null)).withRel("delete");
+        final Link updateLink = linkTo(methodOn(UserController.class).updateUser(user.getUserId(),null,null)).withRel("update");
 
         //Add links to model
         userEntityModel.add(deleteLink);

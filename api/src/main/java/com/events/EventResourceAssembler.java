@@ -27,7 +27,7 @@ class EventResourceAssembler implements RepresentationModelAssembler<Event, Enti
     @Override
     public EntityModel<Event> toModel(Event event) {
         //Get a link to this function, and to the list all events function
-        Link selfLink = linkTo(methodOn(EventController.class).getEventById(event.getEventId())).withSelfRel();
+        Link selfLink = linkTo(methodOn(EventController.class).getEventById(event.getEventId(),null)).withSelfRel();
         Link eventsLink = linkTo(methodOn(EventController.class).list()).withRel("all_events");
 
         //Create an entity model for the event, with a self link and a link to get all events
@@ -39,12 +39,12 @@ class EventResourceAssembler implements RepresentationModelAssembler<Event, Enti
         List<Link> conditionalLinks = new LinkedList<>();
 
         //Get all links
-        final Link deleteLink = linkTo(methodOn(EventController.class).deleteEvent(event.getEventId())).withRel("delete");
-        final Link cancelLink = linkTo(methodOn(EventController.class).cancelEvent(event.getEventId())).withRel("cancel");
-        final Link joinLink = linkTo(methodOn(EventController.class).joinEvent(event.getEventId())).withRel("join");
-        final Link leaveLink = linkTo(methodOn(EventController.class).leaveEvent(event.getEventId())).withRel("leave");
-        final Link updateLink = linkTo(methodOn(EventController.class).updateEvent(null, event.getEventId())).withRel("update");
-        final Link completeLink = linkTo(methodOn(EventController.class).markFinished(event.getEventId())).withRel("complete");
+        final Link deleteLink = linkTo(methodOn(EventController.class).deleteEvent(event.getEventId(),null)).withRel("delete");
+        final Link cancelLink = linkTo(methodOn(EventController.class).cancelEvent(event.getEventId(),null)).withRel("cancel");
+        final Link joinLink = linkTo(methodOn(EventController.class).joinEvent(event.getEventId(),null)).withRel("join");
+        final Link leaveLink = linkTo(methodOn(EventController.class).leaveEvent(event.getEventId(),null)).withRel("leave");
+        final Link updateLink = linkTo(methodOn(EventController.class).updateEvent(null, event.getEventId(),null)).withRel("update");
+        final Link completeLink = linkTo(methodOn(EventController.class).markFinished(event.getEventId(),null)).withRel("complete");
 
 
         //Filter links based on event status

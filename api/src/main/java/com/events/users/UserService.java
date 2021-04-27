@@ -1,13 +1,12 @@
 package com.events.users;
 
+import com.events.Enums.UserAccountStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-
-import com.events.Enums.UserAccountStatus;
 
 @Service
 public class UserService {
@@ -24,11 +23,23 @@ public class UserService {
 
     public User get(Integer id) {
         Optional<User> user = repo.findById(id);
-        if(user.isPresent()){
+        if (user.isPresent()) {
             return user.get();
         }
-        throw new NoSuchElementException("Unable to find user with id: "+id);
+        throw new NoSuchElementException("Unable to find user with id: " + id);
     }
+
+    public User getByEmail(String email) {
+        List<User> allUsers = repo.findAll();
+        for (User user : allUsers) {
+            if (user.getEmail().equalsIgnoreCase(email)) {
+                return user;
+            }
+        }
+
+        throw new NoSuchElementException("Unable to find user with email: " + email);
+    }
+
 
     public void delete(Integer id) {
         User user = get(id);
@@ -38,10 +49,10 @@ public class UserService {
 
     public User update(User user) {
         Optional<User> userOptional = repo.findById(user.getUserId());
-        if(userOptional.isPresent()){
+        if (userOptional.isPresent()) {
             return save(userOptional.get());
         }
-        throw new NoSuchElementException("Unable to find user with id: "+user.getUserId());
+        throw new NoSuchElementException("Unable to find user with id: " + user.getUserId());
     }
 
 
