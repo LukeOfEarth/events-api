@@ -10,8 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.*;
-import java.util.NoSuchElementException;
 
+import java.util.NoSuchElementException;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -29,20 +29,16 @@ public class UserController {
 
     @GetMapping("users")
     public ResponseEntity<?> list() {
-        try {
-            //Create a collection model of users
-            CollectionModel<EntityModel<User>> userModels = assembler.toCollectionModel(service.listAll());
+        //Create a collection model of users
+        CollectionModel<EntityModel<User>> userModels = assembler.toCollectionModel(service.listAll());
 
-            //Create a link to this function and add to the collection model
-            Link selfLink = linkTo(methodOn(UserController.class).list()).withSelfRel();
-            userModels.add(selfLink);
+        //Create a link to this function and add to the collection model
+        Link selfLink = linkTo(methodOn(UserController.class).list()).withSelfRel();
+        userModels.add(selfLink);
 
-            //Return a collection model containing all users, and a link to this function
+        //Return a collection model containing all users, and a link to this function
 
-            return ResponseEntity.ok(userModels);
-        }catch(Exception e){
-            return ResponseEntity.ok(e.toString());
-        }
+        return ResponseEntity.ok(userModels);
     }
 
     @PostMapping("users")
@@ -64,24 +60,24 @@ public class UserController {
     }
 
     @DeleteMapping("users/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable Integer id,@AuthenticationPrincipal OidcUser principle) {
+    public ResponseEntity<?> deleteUser(@PathVariable Integer id, @AuthenticationPrincipal OidcUser principle) {
         String authUserEmail = principle.getAttributes().get("email").toString();
 
         User user = service.get(id);
 
-        if(user.getEmail().equalsIgnoreCase(authUserEmail)) {
+        if (user.getEmail().equalsIgnoreCase(authUserEmail)) {
             service.delete(id);
-        }else{
+        } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Insufficient privileges");
         }
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("users/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestBody User user,@AuthenticationPrincipal OidcUser principle){
+    public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestBody User user, @AuthenticationPrincipal OidcUser principle) {
         String authUserEmail = principle.getAttributes().get("email").toString();
 
-        if(user.getEmail().equalsIgnoreCase(authUserEmail)) {
+        if (user.getEmail().equalsIgnoreCase(authUserEmail)) {
             user.setUserId(id);
             EntityModel<User> userEntityModel = assembler.toModel(service.update(user));
             return ResponseEntity.created(userEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(userEntityModel);
