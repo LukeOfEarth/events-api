@@ -22,9 +22,6 @@ public class User {
     private String email;
     private UserAccountStatus status;
 
-    @JsonIgnore
-    private String authId;
-
 
     @OneToMany(mappedBy = "user")
     Set<EventUser> eventsstatus;
