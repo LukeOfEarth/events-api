@@ -1,17 +1,14 @@
 package com.events.users;
 
-
 import com.events.Enums.UserAccountStatus;
 import com.events.eventsusers.EventUser;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.*;
 import java.util.Set;
 
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,
-        property = "userId")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "userId")
 
 @Entity
 public class User {
@@ -21,7 +18,6 @@ public class User {
     private String name;
     private String email;
     private UserAccountStatus status;
-
 
     @OneToMany(mappedBy = "user")
     Set<EventUser> eventsstatus;
@@ -60,11 +56,11 @@ public class User {
         this.email = email;
     }
 
-    public void setStatus(UserAccountStatus status){
+    public void setStatus(UserAccountStatus status) {
         this.status = status;
     }
 
-    public UserAccountStatus getStatus(){
+    public UserAccountStatus getStatus() {
         return status;
     }
 
@@ -72,16 +68,8 @@ public class User {
         return eventsstatus;
     }
 
-    public String getAuthId() { return authId; }
-
-    public void setAuthId(String authId) { this.authId = authId; }
-
     @Override
     public String toString() {
-        return "User{" +
-                "userId=" + userId +
-                ", name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                '}';
+        return "User{" + "userId=" + userId + ", name='" + name + '\'' + ", email='" + email + '\'' + '}';
     }
 }
