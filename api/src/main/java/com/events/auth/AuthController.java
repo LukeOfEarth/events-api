@@ -1,4 +1,4 @@
-package com.events.oauth2;
+package com.events.auth;
 
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
@@ -25,8 +25,8 @@ public class AuthController {
 
         OidcIdToken rawIdToken = principle.getIdToken();
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
-        .setAudience(Collections.singletonList(CLIENT_ID))
-        .build();
+                .setAudience(Collections.singletonList(CLIENT_ID))
+                .build();
 
 
         GoogleIdToken idToken = verifier.verify(rawIdToken.getTokenValue());
