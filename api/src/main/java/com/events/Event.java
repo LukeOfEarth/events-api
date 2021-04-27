@@ -23,7 +23,7 @@ public class Event {
     private Date time;
     private String location;
     private int ownerId;
-    private EventStatus status;
+    private EventStatus status = EventStatus.UPCOMMING;
 
 
     @OneToMany(mappedBy = "event")
