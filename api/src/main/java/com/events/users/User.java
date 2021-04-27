@@ -25,6 +25,10 @@ public class User {
     public User() {
 
     }
+    public User(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
 
     public User(String name, String email, int status) {
         this.name = name;

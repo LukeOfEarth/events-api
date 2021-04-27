@@ -2,6 +2,7 @@ package com.events.users;
 
 import com.events.Enums.UserAccountStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,6 +30,17 @@ public class UserService {
         throw new NoSuchElementException("Unable to find user with id: " + id);
     }
 
+    public User getByPrinciple(OidcUser principle) {
+        List<User> allUsers = repo.findAll();
+        String email = principle.getEmail();
+        for (User user : allUsers) {
+            if (user.getEmail().equalsIgnoreCase(email)) {
+                return user;
+            }
+        }
+        String name = principle.getFullName();
+        return this.save(new User(name, email));
+    }
     public User getByEmail(String email) {
         List<User> allUsers = repo.findAll();
         for (User user : allUsers) {
