@@ -27,16 +27,20 @@ public class UserController {
 
     @GetMapping("users")
     public ResponseEntity<?> list() {
-        //Create a collection model of users
-        CollectionModel<EntityModel<User>> userModels = assembler.toCollectionModel(service.listAll());
+        try {
+            //Create a collection model of users
+            CollectionModel<EntityModel<User>> userModels = assembler.toCollectionModel(service.listAll());
 
-        //Create a link to this function and add to the collection model
-        Link selfLink = linkTo(methodOn(UserController.class).list()).withSelfRel();
-        userModels.add(selfLink);
+            //Create a link to this function and add to the collection model
+            Link selfLink = linkTo(methodOn(UserController.class).list()).withSelfRel();
+            userModels.add(selfLink);
 
-        //Return a collection model containing all users, and a link to this function
+            //Return a collection model containing all users, and a link to this function
 
-        return ResponseEntity.ok(userModels);
+            return ResponseEntity.ok(userModels);
+        }catch(Exception e){
+            return ResponseEntity.ok(e.toString());
+        }
     }
 
     @PostMapping("users")
@@ -65,6 +69,7 @@ public class UserController {
 
     @PatchMapping("users/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestBody User user){
+
         user.setUserId(id);
         EntityModel<User> userEntityModel = assembler.toModel(service.update(user));
 
