@@ -1,209 +1,331 @@
 {
 	"info": {
-		"_postman_id": "bba14166-6662-4ada-a13d-0a7eef2aef28",
+		"_postman_id": "2a6c19de-151f-4495-b983-64fabf2218cf",
 		"name": "Events API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "Get User List",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{Server}}/users",
-					"host": [
-						"{{Server}}"
-					],
-					"path": [
-						"users"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Create user",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"name\": \"Test User\",\r\n    \"email\": \"test@test.com\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+			"name": "Events",
+			"item": [
+				{
+					"name": "Create event",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Test Event\",\r\n    \"description\": \"Description of Event\",\r\n    \"time\": \"2021-04-25T12:00:00Z\",\r\n    \"location\": \"Mars\",\r\n    \"ownerId\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Server}}/newEvent",
+							"host": [
+								"{{Server}}"
+							],
+							"path": [
+								"newEvent"
+							]
 						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "{{Server}}/users",
-					"host": [
-						"{{Server}}"
-					],
-					"path": [
-						"users"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get user by ID",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{Server}}/users/1",
-					"host": [
-						"{{Server}}"
-					],
-					"path": [
-						"users",
-						"1"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get Event List",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{Server}}/events",
-					"host": [
-						"{{Server}}"
-					],
-					"path": [
-						"events"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get event by ID",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{Server}}/events/1",
-					"host": [
-						"{{Server}}"
-					],
-					"path": [
-						"events",
-						"1"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Create event",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"name\": \"Test Event\",\r\n    \"description\": \"Description of Event\",\r\n    \"time\": \"2021-04-25T12:00:00Z\",\r\n    \"location\": \"Mars\",\r\n    \"ownerId\": 1\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+				{
+					"name": "Get Event List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{Server}}/events",
+							"host": [
+								"{{Server}}"
+							],
+							"path": [
+								"events"
+							]
 						}
-					}
+					},
+					"response": []
 				},
-				"url": {
-					"raw": "{{Server}}/newEvent",
-					"host": [
-						"{{Server}}"
-					],
-					"path": [
-						"newEvent"
-					]
+				{
+					"name": "Get event by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{Server}}/events/1",
+							"host": [
+								"{{Server}}"
+							],
+							"path": [
+								"events",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Event",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Test Event\",\r\n    \"description\": \"Description of Event\",\r\n    \"time\": \"2021-04-25T12:00:00Z\",\r\n    \"location\": \"Jupiter\",\r\n    \"ownerId\": 1,\r\n    \"status\": 0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Server}}/events/update/1",
+							"host": [
+								"{{Server}}"
+							],
+							"path": [
+								"events",
+								"update",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Event",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Server}}/events/cancel/1",
+							"host": [
+								"{{Server}}"
+							],
+							"path": [
+								"events",
+								"cancel",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Event",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Server}}/events/delete/1",
+							"host": [
+								"{{Server}}"
+							],
+							"path": [
+								"events",
+								"delete",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mark Event Complete",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Test Event\",\r\n    \"description\": \"Description of Event\",\r\n    \"time\": \"2021-04-25T12:00:00Z\",\r\n    \"location\": \"Mars\",\r\n    \"ownerId\": 1,\r\n    \"status\":0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Server}}/events/complete/1",
+							"host": [
+								"{{Server}}"
+							],
+							"path": [
+								"events",
+								"complete",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Join Event",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{Server}}/events/1/join",
+							"host": [
+								"{{Server}}"
+							],
+							"path": [
+								"events",
+								"1",
+								"join"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Leave Event",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{Server}}/events/1/leave",
+							"host": [
+								"{{Server}}"
+							],
+							"path": [
+								"events",
+								"1",
+								"leave"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Ban a user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{Server}}/events/1/ban/1",
+							"host": [
+								"{{Server}}"
+							],
+							"path": [
+								"events",
+								"1",
+								"ban",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Unban a user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{Server}}/events/1/unban/1",
+							"host": [
+								"{{Server}}"
+							],
+							"path": [
+								"events",
+								"1",
+								"unban",
+								"1"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "Join Event",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"url": {
-					"raw": "{{Server}}/events/1/join",
-					"host": [
-						"{{Server}}"
-					],
-					"path": [
-						"events",
-						"1",
-						"join"
-					]
+			"name": "Users",
+			"item": [
+				{
+					"name": "Create user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Test User\",\r\n    \"email\": \"test@test.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{Server}}/users",
+							"host": [
+								"{{Server}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{Server}}/users",
+							"host": [
+								"{{Server}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get user by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{Server}}/users/1",
+							"host": [
+								"{{Server}}"
+							],
+							"path": [
+								"users",
+								"1"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
-		},
-		{
-			"name": "Leave Event",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"url": {
-					"raw": "{{Server}}/events/1/leave",
-					"host": [
-						"{{Server}}"
-					],
-					"path": [
-						"events",
-						"1",
-						"leave"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Ban a user",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"url": {
-					"raw": "{{Server}}/events/1/ban/1",
-					"host": [
-						"{{Server}}"
-					],
-					"path": [
-						"events",
-						"1",
-						"ban",
-						"1"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Unban a user",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"url": {
-					"raw": "{{Server}}/events/1/unban/1",
-					"host": [
-						"{{Server}}"
-					],
-					"path": [
-						"events",
-						"1",
-						"unban",
-						"1"
-					]
-				}
-			},
-			"response": []
+			]
 		}
 	],
 	"event": [
