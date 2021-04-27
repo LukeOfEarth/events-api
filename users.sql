@@ -14,5 +14,5 @@ IF NOT EXISTS `eventsdb`.`user`
 (`User_Id`));
 
 ALTER TABLE `eventsdb`.`user` 
-CHANGE COLUMN `` `Auth_Id` VARCHAR
+ADD `Auth_Id` VARCHAR
 (30) NOT NULL ;
