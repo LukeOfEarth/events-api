@@ -3,7 +3,7 @@ package com.events.eventsusers;
 import javax.persistence.*;
 
 import com.events.Enums.UserStatus;
-import com.events.Event;
+import com.events.events.Event;
 import com.events.users.User;
 
 @Entity

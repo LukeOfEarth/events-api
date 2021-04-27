@@ -1,4 +1,4 @@
-package com.events;
+package com.events.events;
 
 import com.events.eventsusers.EventUserKey;
 import com.events.eventsusers.EventUser;

@@ -1,4 +1,4 @@
-package com.events;
+package com.events.events;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
