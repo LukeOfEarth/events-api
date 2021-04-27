@@ -41,13 +41,10 @@ public class EventController {
         this.eventResourceAssembler = eventResourceAssembler;
     }
 
-    private String getAuthUserEmail(OidcUser principle){
-        return principle.getAttributes().get("email").toString();
-    }
     private boolean getIsEventOwner(Event event, OidcUser principle){
-        String authUserEmail = getAuthUserEmail(principle);
+        String authUserEmail = principle.getEmail();
 
-        User owner  = userservice.get(event.getOwnerId());
+        User owner = userservice.get(event.getOwnerId());
 
         return owner.getEmail().equalsIgnoreCase(authUserEmail);
     }
@@ -84,7 +81,8 @@ public class EventController {
     @PostMapping("newEvent")
     public ResponseEntity<?> createEvent(@RequestBody Event event,@AuthenticationPrincipal OidcUser principle) {
         //User is automatically owner if they create a new event
-        eventResourceAssembler.setIsOwner(getIsEventOwner(event,principle));
+        userservice.getByPrinciple(principle);//Create user if they don't exist
+        eventResourceAssembler.setIsOwner(true);
         EntityModel<Event> eventEntityModel = eventResourceAssembler.toModel(service.save(event));
 
         return ResponseEntity.created(eventEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(eventEntityModel);
@@ -143,7 +141,8 @@ public class EventController {
     @PostMapping("events/{id}/join")
     public ResponseEntity<?> joinEvent(@PathVariable Integer id,@AuthenticationPrincipal OidcUser principle) {
         try {
-            User user = userservice.getByEmail(getAuthUserEmail(principle));
+            //Get or create user if they try and join event
+            User user = userservice.getByPrinciple(principle);
             Event event = service.get(id);
             EventUserKey eventUserKey = new EventUserKey(event.getEventId(), user.getUserId());
             EventUser eventUser;
@@ -169,7 +168,7 @@ public class EventController {
     @PostMapping("events/{eventid}/unban/{useridtounban}")
     public ResponseEntity<?> unbanUser(@PathVariable Integer eventid, @PathVariable Integer useridtounban,@AuthenticationPrincipal OidcUser principle) {
         try {
-            User user = userservice.getByEmail(getAuthUserEmail(principle));
+            User user = userservice.getByEmail(principle.getEmail());
 
             User usertoban = userservice.get(useridtounban);
             Event event = service.get(eventid);
@@ -198,7 +197,7 @@ public class EventController {
     @PostMapping("events/{eventid}/ban/{useridtoban}")
     public ResponseEntity<?> banUser(@PathVariable Integer eventid, @PathVariable Integer useridtoban,@AuthenticationPrincipal OidcUser principle) {
         try {
-            User user = userservice.getByEmail(getAuthUserEmail(principle));
+            User user = userservice.getByEmail(principle.getEmail());
 
             User usertoban = userservice.get(useridtoban);
             Event event = service.get(eventid);
@@ -226,7 +225,7 @@ public class EventController {
     @PostMapping("events/{id}/leave")
     public ResponseEntity<?> leaveEvent(@PathVariable Integer id,@AuthenticationPrincipal OidcUser principle) {
         try {
-            User user = userservice.getByEmail(getAuthUserEmail(principle));
+            User user = userservice.getByEmail(principle.getEmail());
             Event event = service.get(id);
             EventUserKey eventUserKey = new EventUserKey(event.getEventId(), user.getUserId());
             EventUser eventUser;

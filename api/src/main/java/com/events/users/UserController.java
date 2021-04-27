@@ -61,30 +61,36 @@ public class UserController {
 
     @DeleteMapping("users/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Integer id, @AuthenticationPrincipal OidcUser principle) {
-        String authUserEmail = principle.getAttributes().get("email").toString();
+        try {
+            String authUserEmail = principle.getEmail();
 
-        User user = service.get(id);
+            User user = service.get(id);
 
-        if (user.getEmail().equalsIgnoreCase(authUserEmail)) {
-            service.delete(id);
-        } else {
+            if (user.getEmail().equalsIgnoreCase(authUserEmail)) {
+                service.delete(id);
+                return ResponseEntity.ok().build();
+            }
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Insufficient privileges");
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
-        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("users/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestBody User user, @AuthenticationPrincipal OidcUser principle) {
-        String authUserEmail = principle.getAttributes().get("email").toString();
+        try {
+            String authUserEmail = principle.getEmail();
 
-        if (user.getEmail().equalsIgnoreCase(authUserEmail)) {
-            user.setUserId(id);
-            EntityModel<User> userEntityModel = assembler.toModel(service.update(user));
-            return ResponseEntity.created(userEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(userEntityModel);
+            if (user.getEmail().equalsIgnoreCase(authUserEmail)) {
+                user.setUserId(id);
+                EntityModel<User> userEntityModel = assembler.toModel(service.update(user));
+                return ResponseEntity.created(userEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(userEntityModel);
+            }
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Insufficient privileges");
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
-
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Insufficient privileges");
-
     }
 
 }
