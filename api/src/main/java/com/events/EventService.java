@@ -1,6 +1,9 @@
 package com.events;
 
 import com.events.Enums.EventStatus;
+import com.events.eventsusers.EventUser;
+import com.events.eventsusers.EventsUsersRepository;
+import com.events.users.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

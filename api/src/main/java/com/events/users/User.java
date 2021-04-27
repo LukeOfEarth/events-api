@@ -4,6 +4,7 @@ package com.events.users;
 import com.events.Enums.UserAccountStatus;
 import com.events.eventsusers.EventUser;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.*;
@@ -21,6 +22,8 @@ public class User {
     private String email;
     private UserAccountStatus status;
 
+    @JsonIgnore
+    private String authId;
 
 
     @OneToMany(mappedBy = "user")
@@ -71,6 +74,10 @@ public class User {
     public Set<EventUser> getEventsstatus() {
         return eventsstatus;
     }
+
+    public String getAuthId() { return authId; }
+
+    public void setAuthId(String authId) { this.authId = authId; }
 
     @Override
     public String toString() {
