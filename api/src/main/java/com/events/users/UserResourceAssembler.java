@@ -11,12 +11,20 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Component
 class UserResourceAssembler implements RepresentationModelAssembler<User, EntityModel<User>> {
+    private boolean isOwner;
 
+    public UserResourceAssembler() {
+        this.isOwner = false;
+    }
+
+    public void setIsOwner(boolean owner) {
+        this.isOwner = owner;
+    }
 
     @Override
     public EntityModel<User> toModel(User user) {
         //Get a link to this function, and to the list all users function
-        Link selfLink = linkTo(methodOn(UserController.class).getUserById(user.getUserId())).withSelfRel();
+        Link selfLink = linkTo(methodOn(UserController.class).getUserById(user.getUserId(),null)).withSelfRel();
         Link usersLink = linkTo(methodOn(UserController.class).list()).withRel("all_users");
 
         //Create an entity model for the user, with a self link and a link to get all users
@@ -24,13 +32,15 @@ class UserResourceAssembler implements RepresentationModelAssembler<User, Entity
                 selfLink,
                 usersLink);
 
-        //Add additional links for update and delete
-        final Link deleteLink = linkTo(methodOn(UserController.class).deleteUser(user.getUserId(),null)).withRel("delete");
-        final Link updateLink = linkTo(methodOn(UserController.class).updateUser(user.getUserId(),null,null)).withRel("update");
+        if(isOwner) {
+            //Add additional links for update and delete
+            final Link deleteLink = linkTo(methodOn(UserController.class).deleteUser(user.getUserId(), null)).withRel("delete");
+            final Link updateLink = linkTo(methodOn(UserController.class).updateUser(user.getUserId(), null, null)).withRel("update");
 
-        //Add links to model
-        userEntityModel.add(deleteLink);
-        userEntityModel.add(updateLink);
+            //Add links to model
+            userEntityModel.add(deleteLink);
+            userEntityModel.add(updateLink);
+        }
 
         return userEntityModel;
 

@@ -29,6 +29,7 @@ public class UserController {
 
     @GetMapping("users")
     public ResponseEntity<?> list() {
+        assembler.setIsOwner(false);
         //Create a collection model of users
         CollectionModel<EntityModel<User>> userModels = assembler.toCollectionModel(service.listAll());
 
@@ -43,16 +44,24 @@ public class UserController {
 
     @PostMapping("users")
     public ResponseEntity<?> createUser(@RequestBody User user) {
-
+        assembler.setIsOwner(false);
         EntityModel<User> userEntityModel = assembler.toModel(service.save(user));
 
         return ResponseEntity.created(userEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(userEntityModel);
     }
 
     @GetMapping("users/{id}")
-    public ResponseEntity<?> getUserById(@PathVariable Integer id) {
+    public ResponseEntity<?> getUserById(@PathVariable Integer id, @AuthenticationPrincipal OidcUser principle) {
         try {
+            String authUserEmail = principle.getEmail();
+
             User user = service.get(id);
+
+            if (user.getEmail().equalsIgnoreCase(authUserEmail)) {
+                assembler.setIsOwner(true);
+            }else{
+                assembler.setIsOwner(false);
+            }
             return ResponseEntity.ok(assembler.toModel(user));
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -83,6 +92,7 @@ public class UserController {
 
             if (user.getEmail().equalsIgnoreCase(authUserEmail)) {
                 user.setUserId(id);
+                assembler.setIsOwner(true);
                 EntityModel<User> userEntityModel = assembler.toModel(service.update(user));
                 return ResponseEntity.created(userEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(userEntityModel);
             }
